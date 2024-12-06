@@ -63,7 +63,7 @@ def load_gestures():
 
 # Gesture Capture Function
 def capture_gestures():
-    gestures_to_capture = ["next", "previous", "zoom in", "zoom out", "play", "pause", "mute", "volume up", "volume down"]
+    gestures_to_capture = ["next", "previous", "zoom in", "zoom out", "play", "pause", "mute", "volume up", "volume down", "scroll up", "scroll down"]
     samples_per_gesture = 5
     gesture_data = {}
 
@@ -145,13 +145,17 @@ def perform_action(action):
         subprocess.run(['osascript', '-e', 'set volume output volume (output volume of (get volume settings) + 20)'])
     elif action == 'volume down':
         subprocess.run(['osascript', '-e', 'set volume output volume (output volume of (get volume settings) - 20)'])
+    elif action == 'scroll up':
+        pyautogui.scroll(10)  # Scroll up
+    elif action == 'scroll down':
+        pyautogui.scroll(-10)  # Scroll down
     else:
         logging.warning(f"Action '{action}' is not defined!")
 
 # Enhanced Voice Command Recognition
 def recognize_voice_command():
     recognizer = sr.Recognizer()
-    expected_commands = ["next", "previous", "zoom in", "zoom out", "play", "pause", "mute", "volume up", "volume down"]
+    expected_commands = ["next", "previous", "zoom in", "zoom out", "play", "pause", "mute", "volume up", "volume down", "scroll up", "scroll down"]
     retries = 2
 
     with sr.Microphone() as source:
