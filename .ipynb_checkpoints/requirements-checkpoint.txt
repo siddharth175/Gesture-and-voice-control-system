@@ -1,0 +1,8 @@
+opencv-python
+mediapipe
+numpy
+pyautogui
+subprocess
+speechrecognition
+pyqt5
+scipy
