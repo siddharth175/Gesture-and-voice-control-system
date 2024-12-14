@@ -1,4 +1,3 @@
-
 # ✨ Gesture & Voice Control System ✨  
 
 Welcome to the **Gesture & Voice Control System**, an innovative project that lets you control presentations, videos, and even digital art using hand gestures and voice commands.  
@@ -26,6 +25,10 @@ This system offers a seamless, interactive experience, eliminating the need for 
   - **Volume Up**: Swipe upwards to increase the volume.  
   - **Volume Down**: Swipe downwards to decrease the volume.  
 
+#### Scrolling Control (New!)  
+- **Scroll Up**: Use a "scroll up" gesture to move content upwards.  
+- **Scroll Down**: Use a "scroll down" gesture to move content downwards.  
+
 ---
 
 ### 🎤 Voice Commands  
@@ -44,6 +47,10 @@ This system offers a seamless, interactive experience, eliminating the need for 
 - **"Volume Up"**: Increase the volume.  
 - **"Volume Down"**: Decrease the volume.  
 
+#### Scrolling Control (New!)  
+- **"Scroll Up"**: Move the content upwards.  
+- **"Scroll Down"**: Move the content downwards.  
+
 ---
 
 ### 🎨 Real-Time Drawing  
@@ -51,6 +58,26 @@ This system offers a seamless, interactive experience, eliminating the need for 
 - **Freehand Drawing**: Draw on a digital canvas using hand gestures.  
 - **Erase Mode**: Switch to erasing mode with a gesture.  
 - **Move Mode**: Move the canvas or your drawing with specific gestures.  
+
+---
+
+### 🔧 Training Mode (New!)  
+
+- Introduces new users to the system by demonstrating gesture recognition and voice command functionalities.  
+- Provides interactive tutorials for mastering gesture and voice controls.  
+- Enables users to practice and refine their gestures and commands in a guided environment.  
+
+---
+
+### 🔐 Admin Pages (New!)  
+
+- **Admin Login**: Access admin settings with the following credentials:  
+  - **Username**: `admin`  
+  - **Password**: `password`  
+- **Features**:  
+  - View system logs and user activities.  
+  - Manage gestures and voice commands.  
+  - Update application settings and preferences.  
 
 ---
 
@@ -112,11 +139,16 @@ python frontend.py
 - **Volume Up**: Swipe upwards.  
 - **Volume Down**: Swipe downwards.  
 
+#### Scrolling Control  
+- **Scroll Up**: Perform a "scroll up" gesture.  
+- **Scroll Down**: Perform a "scroll down" gesture.  
+
 ### Voice Commands  
 
 - **"Next"**, **"Previous"**: Navigate slides.  
 - **"Zoom In"**, **"Zoom Out"**: Adjust zoom levels.  
 - **"Play"**, **"Pause"**, **"Volume Up"**, **"Volume Down"**: Control media playback.  
+- **"Scroll Up"**, **"Scroll Down"**: Control scrolling.  
 
 ### Drawing Modes  
 
@@ -148,5 +180,5 @@ Check out the https://www.youtube.com/watch?v=VMrJXc9wS68 to see the system in a
 
 ---
 
-**Enjoy a smarter way to interact with your digital world!**  
+**Enjoy a smarter way to interact with your digital world!**
 
