@@ -1,8 +1,9 @@
-opencv-python
-mediapipe
 numpy
+mediapipe
+opencv-python
 pyautogui
-subprocess
-speechrecognition
-pyqt5
 scipy
+PyQt5
+playsound==1.2.2  # Make sure this version is used; some newer versions are not compatible
+gTTS
+SpeechRecognition
