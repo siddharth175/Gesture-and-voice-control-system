@@ -1,12 +1,12 @@
 import sys
 import main
-
+import draw
+import training  # Import your backend training module
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QPushButton, QVBoxLayout, QLabel, QWidget, QMessageBox
 )
 from PyQt5.QtCore import Qt
-import draw  # Import your backend file
 
 class ControlWindow(QMainWindow):
     def __init__(self):
@@ -58,6 +58,10 @@ class ControlWindow(QMainWindow):
         self.capture_btn = self.create_button("Capture Gestures", self.capture_gestures)
         layout.addWidget(self.capture_btn)
 
+        # Start Training Button
+        self.training_btn = self.create_button("Start Training", self.start_training)
+        layout.addWidget(self.training_btn)
+
         # Exit Button
         self.exit_btn = self.create_button("Exit", self.close_application, is_exit=True)
         layout.addWidget(self.exit_btn)
@@ -96,11 +100,17 @@ class ControlWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred:\n{e}")
 
-
     def capture_gestures(self):
         """Start gesture capture setup."""
         try:
             main.capture_gestures()  # Call backend gesture capture function
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"An error occurred:\n{e}")
+
+    def start_training(self):
+        """Start the training application."""
+        try:
+            training.start_training()  # Call the start_training function from training.py
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred:\n{e}")
 
