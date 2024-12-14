@@ -13,6 +13,8 @@ import logging
 from queue import Queue
 from threading import Thread
 from scipy.spatial.distance import cosine
+from gtts import gTTS
+import playsound
 
 # Suppress TensorFlow Lite and other warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -152,30 +154,59 @@ def perform_action(action):
     else:
         logging.warning(f"Action '{action}' is not defined!")
 
-# Enhanced Voice Command Recognition
-def recognize_voice_command():
+# Enhanced Voice Command Recognition with Wake-up Word
+def recognize_voice_command(wakeup_word="apple"):
     recognizer = sr.Recognizer()
     expected_commands = ["next", "previous", "zoom in", "zoom out", "play", "pause", "mute", "volume up", "volume down", "scroll up", "scroll down"]
-    retries = 2
 
     with sr.Microphone() as source:
-        for attempt in range(retries + 1):
+        while True:
             try:
-                logging.info(f"Listening for voice commands... (Attempt {attempt + 1}/{retries + 1})")
+                logging.info(f"Listening for wake-up command '{wakeup_word}'...")
                 recognizer.adjust_for_ambient_noise(source, duration=1)
                 audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
                 command = recognizer.recognize_google(audio).lower()
-                for expected in expected_commands:
-                    if expected in command:
-                        logging.info(f"Recognized voice command: {expected}")
-                        return expected
-                logging.warning(f"Unrecognized voice command: {command}")
+
+                if wakeup_word in command:
+                    logging.info(f"Wake-up word '{wakeup_word}' detected.")
+                    # Use gTTS to speak confirmation
+                    tts = gTTS(text="Say command", lang='en')
+                    tts.save("say_command.mp3")
+                    playsound.playsound("say_command.mp3")
+                    os.remove("say_command.mp3")
+
+                    # Now listen for the actual command
+                    recognizer.adjust_for_ambient_noise(source, duration=1)
+                    audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
+                    command = recognizer.recognize_google(audio).lower()
+
+                    if command in expected_commands:
+                        logging.info(f"Command '{command}' accepted.")
+                        tts = gTTS(text=f"Command {command} accepted", lang='en')
+                        tts.save("command_accepted.mp3")
+                        playsound.playsound("command_accepted.mp3")
+                        os.remove("command_accepted.mp3")
+                        return command
+                    else:
+                        logging.warning(f"Command '{command}' not recognized.")
+                        tts = gTTS(text="Command not recognized, please try again", lang='en')
+                        tts.save("command_not_recognized.mp3")
+                        playsound.playsound("command_not_recognized.mp3")
+                        os.remove("command_not_recognized.mp3")
+
+                else:
+                    logging.warning(f"Wake-up word '{wakeup_word}' not detected.")
+                    continue
+
             except sr.UnknownValueError:
-                logging.warning("Could not understand the audio.")
-            except sr.WaitTimeoutError:
-                logging.warning("Voice command timeout.")
-        logging.warning("Failed to recognize a valid voice command after retries.")
-        return None
+                logging.warning("Speech not understood. Retrying...")
+                continue
+            except sr.RequestError as e:
+                logging.error(f"Request failed; {e}")
+                break
+            except Exception as e:
+                logging.error(f"Error during voice recognition: {e}")
+                break
 
 # Combined Gesture and Voice Control
 def start_control():
@@ -190,10 +221,12 @@ def start_control():
         return
 
     last_action_time = 0
+    detected_action = ""
+    similarity_score = 0
 
     def voice_thread():
         while True:
-            command = recognize_voice_command()
+            command = recognize_voice_command()  # Wait for wake-up command
             if command:
                 action_queue.put(command)
 
@@ -202,34 +235,42 @@ def start_control():
     while True:
         success, img = cap.read()
         if not success:
-            logging.error("Failed to read from camera!")
+            logging.error("Camera not accessible!")
             break
 
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         result = hands.process(img_rgb)
-        action = None
 
         if result.multi_hand_landmarks:
             for hand_landmarks in result.multi_hand_landmarks:
-                mp_draw.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
                 landmarks = normalize_landmarks([[lm.x, lm.y, lm.z] for lm in hand_landmarks.landmark])
-                action, similarity = recognize_gesture(landmarks, saved_gestures)
+                detected_gesture, similarity = recognize_gesture(landmarks, saved_gestures)
 
-                if action:
-                    cv2.putText(img, f"Gesture: {action} (Similarity: {similarity:.2f})", 
-                                (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-                    logging.info(f"Gesture Recognized: {action} (Similarity: {similarity:.2f})")
+                if detected_gesture and similarity >= SIMILARITY_THRESHOLD:
+                    detected_action = detected_gesture
+                    similarity_score = similarity
+                else:
+                    detected_action = None
+                    similarity_score = 0
+
+                if detected_action and time.time() - last_action_time > ACTION_DELAY:
+                    action_queue.put(detected_action)
+                    last_action_time = time.time()
 
         if not action_queue.empty():
             action = action_queue.get()
+            if action:
+                logging.info(f"Performing action: {action}")
+                perform_action(action)
 
-        if action and time.time() - last_action_time > ACTION_DELAY:
-            last_action_time = time.time()
-            perform_action(action)
+        # Display gestures and landmarks
+        if detected_action:
+            cv2.putText(img, f"Detected Gesture: {detected_action} ({round(similarity_score*100, 2)}%)", 
+                        (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
         cv2.imshow("Gesture and Voice Control", img)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
-            logging.info("Control interrupted.")
             break
 
     cap.release()
