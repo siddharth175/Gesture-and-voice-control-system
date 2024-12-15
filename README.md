@@ -176,7 +176,7 @@ python frontend.py
 
 ## 🎥 Demo  
 
-Check out the https://www.youtube.com/watch?v=VMrJXc9wS68 to see the system in action!  
+Check out the https://youtu.be/eoM_FcPw1d4 to see the system in action!  
 
 ---
 
